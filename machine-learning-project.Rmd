@@ -20,45 +20,108 @@ library(repmis)
 
 ## Executive summary
 
-The goal of your project is to predict the manner in which the participants did their exercise. This is the "classe" variable in the training set. 
-The following variables are used to predict the the manner in which the participants did their exercise:  
+The goal of your project is to predict the manner in which the participants did their exercise (correctly or incorrectly). This is the "classe" variable in the training set.  
 
-This report describe how the prediction model was built, how cross validation was used.
+Two prediction models, classification trees and random forest, are compared in order to find out which model performs best in predicting the manner in which the participants did their exercise.  
 
-In addition this report describe what needed to be expected out of sample error.
+This report describe how the prediction models were built, and how cross validation was conducted.
 
-The prediction model will be used to predict 20 different test cases.
-
+As a result, this project shows that the random forest model performs better that the classification trees in predicting the manner in which the participants did their exercise.
 
 
 ## Backgroung
 
-Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset). 
+Using devices such as *Jawbone Up, Nike FuelBand,* and *Fitbit* it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset). 
 
-## Loading the data
+## Loading and cleaning the data
+```{r}
+# import the data from the URLs
 
-pml_training <- read_csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv")
-View(pml_training)
-str(pml_training)
+# trainurl <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+# testurl <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+# training <- download.file(trainurl, "training.csv")
+# testing <- download.file(testurl, "testing.csv")
 
-pml_testing <- read_csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv")
-View(pml_testing)
+# load the data locally
+training <- read.csv("training.csv", na.strings = c("NA", ""))
+testing <- read.csv("testing.csv", na.strings = c("NA", ""))
 
-
-
-## Cleaning the data
-
-
-```{r cars}
-summary(cars)
+# deleting columns (predictors) that contain any missing values
+training <- training[, colSums(is.na(training)) == 0]
+testing <- testing[, colSums(is.na(testing)) == 0]
 ```
 
-## Including Plots
+## Splitting the training data set for out-of-sample errors
 
-You can also embed plots, for example:
+In order to get out-of-sample errors, we need to split the training set into train data set (train, 70%) for prediction and a validation data set (valid 30%)
+```{r}
+# splitting the training data set:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+set.seed(123) 
+inTrain <- createDataPartition(training$classe, p = 0.7, list = FALSE)
+train <- training[inTrain, ]
+valid <- training[-inTrain, ]
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Using two prediction models: classification trees and random forest
+
+### Classification trees model
+We use here a 5-fold cross validation (default setting in trainControl function is 10) to save a computing time.
+
+
+```{r}
+control <- trainControl(method = "cv", number = 5)
+fit_rpart <- train(classe ~ ., data = train, method = "rpart", 
+                   trControl = control)
+print(fit_rpart, digits = 4)
+```
+
+```{r}
+# plotting the classification trees
+fancyRpartPlot(fit_rpart$finalModel)
+```
+
+```{r}
+# predicting the outcomes with the classification trees model using the validation data set
+predict_rpart <- predict(fit_rpart, valid)
+# Showing the confusion matrix
+confusionMatrix(predict_rpart, valid$classe)
+```
+
+
+As we can see under the overall statistics, the accuracy of the classification trees model is: 0.6619
+
+
+### Random forest Model
+
+Now we try the random forest model:
+
+```{r}
+fit_rf <- train(classe ~ ., data = train, method = "rf", 
+                   trControl = control)
+print(fit_rf, digits = 4)
+
+```
+
+```{r}
+# predicting the outcomes with the random forest model using the validation data set
+predict_rf <- predict(fit_rf, valid)
+
+# Showing the confusion matrix of the random forest model
+confusionMatrix(predict_rf, valid$classe)
+
+```
+
+As we can see under the overall statistics, the accuracy of the random forest model is: 0.9998.
+
+## Prediction with the random forest model on the testing data set
+
+Now we use the random forest model on the testing data set to see if it still performs better than the classification trees model.
+
+```{r}
+predict_rfTest <- predict(fit_rf, testing)
+predict_rfTest
+```
+
+

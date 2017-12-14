@@ -7,13 +7,47 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+#loading the packages
+library(caret)
+library(readr)
+library(randomForest)
+library(rattle)
+library(rpart)
+library(rpart.plot)
+library(repmis)
+
 ```
 
-## R Markdown
+## Executive summary
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+The goal of your project is to predict the manner in which the participants did their exercise. This is the "classe" variable in the training set. 
+The following variables are used to predict the the manner in which the participants did their exercise:  
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+This report describe how the prediction model was built, how cross validation was used.
+
+In addition this report describe what needed to be expected out of sample error.
+
+The prediction model will be used to predict 20 different test cases.
+
+
+
+## Backgroung
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset). 
+
+## Loading the data
+
+pml_training <- read_csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv")
+View(pml_training)
+str(pml_training)
+
+pml_testing <- read_csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv")
+View(pml_testing)
+
+
+
+## Cleaning the data
+
 
 ```{r cars}
 summary(cars)

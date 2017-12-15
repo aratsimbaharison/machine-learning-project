@@ -16,7 +16,7 @@ As a result, this project shows that the random forest model performs
 better that the classification trees in predicting the manner in which
 the participants did their exercise.
 
-Backgroung
+Background
 ----------
 
 Using devices such as *Jawbone Up, Nike FuelBand,* and *Fitbit* it is

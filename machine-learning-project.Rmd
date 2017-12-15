@@ -2,7 +2,9 @@
 title: "Machine Learning Course Project"
 author: "AMR"
 date: "December 14, 2017"
-output: html_document
+output:
+  html_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -15,7 +17,10 @@ library(rattle)
 library(rpart)
 library(rpart.plot)
 library(repmis)
-
+library(markdown)
+library(knitr)
+library(ggplot2)
+knit("machine-learning-project.Rmd")
 ```
 
 ## Executive summary

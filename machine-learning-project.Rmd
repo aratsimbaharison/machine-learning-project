@@ -4,11 +4,10 @@ author: "AMR"
 date: "December 14, 2017"
 output:
   html_document: default
-  word_document: default
----
+  md_document : default
+  ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 #loading the packages
 library(caret)
 library(readr)
@@ -20,7 +19,6 @@ library(repmis)
 library(markdown)
 library(knitr)
 library(ggplot2)
-knit("machine-learning-project.Rmd")
 ```
 
 ## Executive summary
